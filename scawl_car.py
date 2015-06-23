@@ -46,7 +46,8 @@ if __name__ == "__main__":
 	for url in ll:
 		res.extend(get_type(url))
 	for item in res:
-		print item[0].encode("utf-8"), item[1]
+		#print item[0].encode("utf-8"), item[1]
+		print item[1]
 		
 
 

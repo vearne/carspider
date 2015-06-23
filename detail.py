@@ -21,6 +21,10 @@ class Car(object):
 		self.top_speed = ''
 		self.acc = ''
 		self.fuel_consumption = ''
+		self.fuel_form = ''
+		self.fuel_grade = ''
+		self.oil_supply = ''
+
 	def __unicode__(self):
 		ll = []
 		ll.append(str(self.type_id))
@@ -36,10 +40,12 @@ class Car(object):
 		ll.append(self.top_speed)
 		ll.append(self.acc)
 		ll.append(self.fuel_consumption)
+		ll.append(self.fuel_form)	
+		ll.append(self.fuel_grade)	
+		ll.append(self.oil_supply)	
 		return ','.join(ll)
 
-def get_param(id):
-	url = "http://car.autohome.com.cn/config/series/%s.html" % (id)
+def get_param(url):
 	car_list = []
         print url
  	fetcher = Fetcher(
@@ -61,7 +67,7 @@ def get_param(id):
 
 	for item in item_list:
 		car = Car()
-		car.type_id = id
+		car.type_id = str(id)
 		car.name = item
 		car_list.append(car)
 	
@@ -145,25 +151,47 @@ def get_param(id):
 	for i in xrange(len(item_list)):
 		car_list[i].fuel_consumption = item_list[i]	
 
+	# --------------- fuel_form ----------------------
+        item_list = tree.xpath('//tr[@id="tr_44"]/td/div/text()')
+        print 'fuel_form', len(item_list)
+	i = 0
+	for i in xrange(len(item_list)):
+		car_list[i].fuel_form = item_list[i]	
+
+	# --------------- fuel_grade ----------------------
+        item_list = tree.xpath('//tr[@id="tr_45"]/td/div/text()')
+        print 'fuel_grade', len(item_list)
+	i = 0
+	for i in xrange(len(item_list)):
+		car_list[i].fuel_grade = item_list[i]	
+
+	# ---------------  oil_supply ----------------------
+        item_list = tree.xpath('//tr[@id="tr_46"]/td/div/text()')
+        print 'oil_supply', len(item_list)
+	i = 0
+	for i in xrange(len(item_list)):
+		car_list[i].oil_supply = item_list[i]	
+
 	return car_list
 
 
 if __name__ == "__main__":
-	id = 812 
-	id_list = []	
-	with open('./id_list.txt') as fp:
-		for line in fp:
-			id_list.append(int(line))
-	print 'len(id_list)', len(id_list)
-	
+	url_list = []
+	with open("./config_url.txt") as f:
+		for line in f:
+			url_list.append(line.strip())
+			
+	i = 0
 	# target_csv	
 	fp = open("./car.csv", 'w')
-	for id in id_list:	
-		car_list = get_param(id)
+	for url in url_list:	
+		i += 1
+		print 'i', i
+		car_list = get_param(url)
 		for car in car_list:
 			fp.write(unicode(car).encode('utf-8'))
 			fp.write('\n')
-
+		fp.flush()
 
 	fp.close()
 
